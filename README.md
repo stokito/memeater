@@ -2,7 +2,7 @@
 
 ## What are Runtime.getRuntime().totalMemory() and freeMemory()?
 
-According to the [API][https://download.oracle.com/javase/6/docs/api/java/lang/Runtime.html]
+According to the [API](https://docs.oracle.com/javase/10/docs/api/java/lang/Runtime.html)
 
     totalMemory()
 
@@ -111,4 +111,11 @@ The linux kernel of container itself took about 8mb of memory so we allowed to J
 
 As you can see Docker killed a container when JVM tried to execute GC. Thus the Java app wasn't shut down gracefully.
 
-
+## Allow JVM to use all memory from cgroups
+    docker run --name=memeater -m=25m --memory-swap=25m --memory-swappiness=0 --kernel-memory=25m -e JAVA_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap" memeater -recover
+    InitialHeapSize: 8388608 = 8mb
+    MaxHeapSize: 14680064 = 14mb
+    Max JVM memory: 13107200 = 12.5mb
+    Total JVM memory: 7864320 = 7.5
+    Allocated: 9mb, consumed: 10418312 bytes, total: 11010048, free memory: 591736 bytes i.e. 0.5643234252929688mb
+    /docker-entry.sh: line 5:     7 Killed                  java $JAVA_OPTS -XX:+PrintFlagsFinal -verbose:gc -Djava.security.egd=file:/dev/./urandom -jar /app.jar "$@"
